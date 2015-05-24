@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=8 ; IE=9" />
+	<title>ファイルサーバログイン</title>
+	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+	<style>
+		html,body {
+			background: #f8f8f8;
+			overflow: hidden;
+		}
+		div.wrap {
+			width: 500px;
+		}
+		#username,#password {
+			font-size: 25px;
+		}
+	</style>
+	<script src="jquery.js"></script>
+	<script src="bootstrap/js/bootstrap.min.js"></script>
+	<script>
+		window.onload = function() {
+			resizeTo(600,400);
+		}
+		window.onresize = function() {
+			resizeTo(600,400);
+		}
+	</script>
+	<script language="VBScript">
+		' 参考サイト http://www.ujp.jp/modules/tech/index.php/System/Programs/VBS_MountNetworkDrive.html
+		
+		Option Explicit
+		Dim objNtWork
+		
+		Sub mount()
+			On Error Resume Next
+			Set objNtWork = CreateObject("WScript.Network")
+			objNtWork.MapNetworkDrive "G:","\\10.1.100.100\homes",,document.logon.username.value,document.logon.password.value
+			Select case Err.Number
+				case 0
+					msgbox "ログインしました。"
+				case -2147023570
+					msgbox "ユーザIDかパスワードが間違っています。"
+				case -2147024811
+					msgbox "すでにログインしています。"
+				case -2147024829
+					msgbox "指定されたドライブが見つかりません。"
+				case -2147024843
+					msgbox "サーバが見つかりません。"
+				case else
+					msgbox "エラーが発生しました。"
+		    end select
+			Set objNtWork = Nothing
+		End Sub
+		
+		Sub unmount()
+			On Error Resume Next
+			Set objNtWork = CreateObject("WScript.Network")
+			objNtWork.RemoveNetworkDrive "G:", True
+			Select case Err.Number
+				case 0
+					msgbox "ログアウトしました。"
+					document.logon.username.value = ""
+					document.logon.password.value = ""
+				case -2147022646 
+					msgbox "ログインしていません。"
+				case else
+					msgbox "エラーが発生しました。"
+				end select
+			Set objNtWork = Nothing
+		End Sub
+		
+		Sub link()
+			Dim objWshShell
+			Set objWshShell = CreateObject("WScript.Shell")
+			objWshShell.Run """firefox.exe"" -new-tab https://10.1.100.100/password"
+			Set objWshShell = Nothing
+		End Sub
+		
+	</script>
+	<HTA:APPLICATION
+	    APPLICATIONNAME="ファイルサーバログイン"
+	    BORDER="thick"
+	    BORDERSTYLE="raised"
+	    CAPTION="yes"
+	    CONTEXTMENU="no"
+	    ICON="note.ico"
+	    ID="value"
+	    INNERBORDER="no"
+	    MAXIMIZEBUTTON="no"
+	    MINIMIZEBUTTON="yes"
+	    NAVIGABLE="no"
+	    SCROLL="no"
+	    SCROLLFLAT="yes"
+	    SELECTION="no"
+	    SHOWINTASKBAR="yes"
+	    SINGLEINSTANCE="yes"
+	    SYSMENU="yes"
+	    VERSION=""
+	    WINDOWSTATE="normal" />
+</head>
+<body>
+	<div class="container wrap">
+		<h1>ファイルサーバログイン</h1>
+		<p>データはバックアップしていますがローカルへコピーしておくようにしてください。使い方は内部サイトへ</p>
+		<form name="logon">
+			<label for="username">ユーザー名</label>
+			<input type="text" id="username" class="input-block-level" placeholder="ユーザー名">
+			
+			<label for="password">パスワード</label>
+			<input type="password" id="password" class="input-block-level" placeholder="パスワード">
+			
+			<div class="form-actions">
+				<button type="button" class="btn btn-large btn-primary" onclick="mount()">ログイン</button>
+				<button type="button" class="btn btn-large" onclick="unmount()">ログアウト</button>
+				<button type="button" class="btn btn-large btn-info" onclick="link()">パスワード変更</button>
+			</div>
+		</form>
+	</div>
+</body>
+</html>
