@@ -11,7 +11,7 @@
 Network drive mount system with html-application. 
 Input username and password in form. You can access network drive with these permission.
 
-![screen](scr_images.png)
+![screen](/tomoyk/netdrive-mnt-gui/scr_images.png)
 
 ## Architecture
 
